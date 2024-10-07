@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>ランチ一覧</title>
+</head>
+<body>
+    <h2>ランチ一覧</h2>
+	<!-- ▽▽▽▽▽ 13.9 ▽▽▽▽▽ -->
+	    <!-- Flashメッセージの表示 -->
+	    <p th:if="${message}" th:text="${message}" 
+	        style="color: blue;">完了メッセージ
+	    </p>
+	    <!-- △△△△△ 13.9 △△△△△ -->
+    <p th:if="${errorMessage}" 
+        th:text="${errorMessage}" style="color: red;">
+        エラーメッセージ
+    </p>
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th	style="width: 5%;">ID</th>
+                <th	style="width: 15%;">メニュー</th>
+                <th	style="width: 15%;">お店</th>
+				<th	style="width: 5%;">値段</th>
+				<th	style="width: 10%;">前回利用日</th>
+				<th	style="width: 5%;">回数</th>
+				<th	style="width: 5%;">評価</th>
+				<th	style="width: 20%;">メモ</th>
+				<th	style="width: 10%;">今日利用</th>
+				<th	style="width: 10%;">データ修正</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="lunch : ${lunches}">
+				<td th:text="${lunch.id}" style="text-align: center;"></td>				
+                <td th:text="${lunch.menu}"></td>
+				<td th:text="${lunch.shop}"></td>
+				<td th:text="${lunch.price}" style="text-align: right;"></td>
+				<td th:text="${lunch.recentDate}" style="text-align: center;"></td>
+				<td th:text="${lunch.times}" style="text-align: center;"></td>
+				<td th:text="${lunch.rate}" style="text-align: center;"></td>
+				<td th:text="${lunch.memo}"></td>
+				<td>
+				    <!-- ボタンをクリックして日付を変更 -->
+					<form th:action="@{/lunches/today/{id}(id=${lunch.id})}" method="post">
+					     <button type="submit">今日利用</button>
+					</form>
+				<td>
+				    <a th:href="@{/lunches/edit/{id}(id=${lunch.id})}">修正</a>
+				</td>
+            </tr>
+        </tbody>
+    </table>
+	<!-- ▽▽▽▽▽ 13.9 ▽▽▽▽▽ -->
+	  <a th:href="@{/lunches/form}">新規登録</a>
+	  <!-- △△△△△ 13.9 △△△△△ -->
+</body>
+</html>
