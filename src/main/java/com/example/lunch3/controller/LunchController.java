@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -75,13 +77,22 @@ public class LunchController {
 	 * 新規登録を実行します。
 	 */
 	@PostMapping("/save")
-	public String create(LunchForm form,RedirectAttributes attributes) {
+	public String create(@Validated LunchForm form,BindingResult bindingResult,
+			RedirectAttributes attributes) {
+		// === バリデーションチェック ===
+		// 入力チェックNG：入力画面を表示する	
+		if (bindingResult.hasErrors()) {
+			// 新規登録画面の設定
+			form.setIsNew(true);
+			return "lunch/form";
+		}
+
 		// エンティティへの変換
-        // 文字列を LocalDate に変換
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate date = LocalDate.parse("2024-01-01", formatter);
-        // 変換した LocalDate を recentDate にセット
-        form.setRecentDate(date);
+		// 文字列を LocalDate に変換
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		LocalDate date = LocalDate.parse("2024-01-01", formatter);
+		// 変換した LocalDate を recentDate にセット
+		form.setRecentDate(date);
 		form.setTimes(0);
 		Lunch Lunch = LunchHelper.convertLunch(form);
 		// 登録実行
@@ -91,7 +102,6 @@ public class LunchController {
 		// PRGパターン
 		return "redirect:/lunches";
 	}
-
 	/**
 	 * 指定されたIDの修正画面を表示します。
 	 */
@@ -118,8 +128,15 @@ public class LunchController {
 	 * 「ランチ」の情報を更新します。
 	 */
 	@PostMapping("/update")
-	public String update(LunchForm form, 
+	public String update(@Validated LunchForm form,BindingResult bindingResult, 
 			RedirectAttributes attributes) {
+		// === バリデーションチェック ===
+		// 入力チェックNG：入力画面を表示する	
+		if (bindingResult.hasErrors()) {
+			// 更新画面の設定
+			form.setIsNew(false);
+			return "lunch/form"; 
+		}		
 		// エンティティへの変換
 		Lunch Lunch = LunchHelper.convertLunch(form);
 		// 更新処理
@@ -127,40 +144,40 @@ public class LunchController {
 		// フラッシュメッセージ
 		attributes.addFlashAttribute("message", "ランチが更新されました");
 
-        // ★フォームデータが正しくマッピングされているか確認
-        System.out.println("Recent Date: " + form.getRecentDate()); 	
-		
+		// ★フォームデータが正しくマッピングされているか確認
+		System.out.println("Recent Date: " + form.getRecentDate()); 	
+
 		// PRGパターン
 		return "redirect:/lunches";
 	}
 	// △△△△△ 13.7追加 △△△△△
-	
+
 	/**
 	 * 指定されたIDの前回利用日を更新します。
 	 */
 	@PostMapping("/today/{id}")
 	public String today(@PathVariable Integer id, Model model,
 			RedirectAttributes attributes) {
-	
+
 		// IDに対応する「ランチ」を取得-1       
 		Lunch target = lunchService.findByIdLunch(id);
 		int times=target.getTimes()+1;
 		System.out.println("times "+times);
-		
-		 // ★今日の日付を取得
-        LocalDate today = LocalDate.now();
-        // ★サービスでランチのrecentDateを今日に更新
-        lunchService.updateRecentDate(id, today, times);
+
+		// ★今日の日付を取得
+		LocalDate today = LocalDate.now();
+		// ★サービスでランチのrecentDateを今日に更新
+		lunchService.updateRecentDate(id, today, times);
 
 		// IDに対応する「ランチ」を取得-2       
 		target = lunchService.findByIdLunch(id);
 
 		if (target != null) {
-			
+
 			// 対象データがある場合はFormへの変換
 			LunchForm form = LunchHelper.convertLunchForm(target);
 			System.out.println("form "+form.getTimes());
-						
+
 			// モデルに格納
 			model.addAttribute("lunchForm", form);
 
@@ -180,7 +197,7 @@ public class LunchController {
 			return "redirect:/lunches";            
 		}
 	}
-	
+
 	// ▽▽▽▽▽ 13.11追加 ▽▽▽▽▽
 	/**
 	 * 指定されたIDの「ランチ」を削除します。

@@ -22,13 +22,23 @@
                 <th>メニュー</th>
                 <td>
                     <input type="text" th:field="*{menu}">
+					<!-- menu用：バリデーションエラー表示 -->
+					<span th:if="${#fields.hasErrors('menu')}" 
+					    th:errors="*{menu}" style="color: red;">
+					    エラーがあれば表示
+					</span>
                 </td>
             </tr>
 			<tr>
 			     <th>お店</th>
 			     <td>
 			         <input type="text" th:field="*{shop}">
-			     </td>
+					 <!-- 詳細用：バリデーションエラー表示 -->
+					 <span th:if="${#fields.hasErrors('shop')}" 
+					     th:errors="*{shop}" style="color: red;">
+					     エラーがあれば表示
+					 </span>
+ 			     </td>
 			 </tr>		
 			 <tr>
 			      <th>値段</th>

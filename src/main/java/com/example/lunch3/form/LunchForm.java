@@ -4,6 +4,8 @@ import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,8 +20,10 @@ public class LunchForm {
 	/** 管理ID */
 	private Integer id;
 	/** メニュー */
+	@NotBlank(message="メニューは必須です。")
 	private String menu;
 	/** お店 */
+	@Size(min=1,max=20,message="お店は{min}～{max}文字以内で入力してください。")
 	private String shop;
 	/** 値段 */
 	private Integer price;
